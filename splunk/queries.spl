@@ -1,0 +1,17 @@
+# Failed logon volume — detects brute-force pattern
+index=main EventCode=4625 | stats count by Account_Name, Source_Network_Address
+
+# Successful logons for the target account
+index=main EventCode=4624 Account_Name=svc_backup | table _time, Source_Network_Address, Logon_Type
+
+# All Sysmon process-creation events for the compromised account
+index=main EventCode=1 source="*Sysmon*" User="*svc_backup*" | table _time, Image, CommandLine, ParentImage | sort _time
+
+# Filtered to the actual recon commands (whoami, ipconfig, powershell launches)
+index=main EventCode=1 source="*Sysmon*" User="*svc_backup*" (CommandLine="*whoami*" OR CommandLine="*net user*" OR CommandLine="*ipconfig*" OR CommandLine="*powershell*") | table _time, Image, CommandLine, ParentImage | sort _time
+
+# net.exe / net1.exe child-process pair — "net user" command
+index=main EventCode=1 source="*Sysmon*" User="*svc_backup*" (Image="*net.exe" OR Image="*net1.exe") | table _time, Image, CommandLine, ParentImage | sort _time
+
+# Sysmon network connections for the compromised account (outbound recon)
+index=main EventCode=3 source="*Sysmon*" User="*svc_backup*" | table _time, DestinationIp, DestinationPort, Image
