@@ -18,7 +18,7 @@ documentation — not just tool familiarity.
 - **Ticket format:** SANS incident handling template
 
 ## Status
-In progress — environment and Sysmon logging verified. Splunk setup next.
+Complete — full attack simulation, investigation, and incident ticket documented. See `docs/incident_ticket_26_001.md` for findings.
 
 ## Structure
 - `docs/` — build plan and incident ticket
